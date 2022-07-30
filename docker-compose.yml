@@ -1,0 +1,34 @@
+version: "3.3"
+
+services:
+  ws-server:
+    build: ./ws_server
+    command: python3 server.py
+    env_file:
+      - local.env
+    ports:
+      - "9999:9999"
+
+  ws-client:
+    build: ./ws_client
+    command: python3 client.py
+    env_file:
+      - local.env
+    depends_on:
+      - redis
+#      - ws-server
+    ports:
+      - "10000:9999"
+
+  dash:
+    build: ./dash
+    command: gunicorn app:server --workers=2 -b 0.0.0.0:80
+    env_file:
+      - local.env
+    ports:
+      - "80:80"
+ #   depends_on:
+ #     - ws-client
+
+  redis:
+    image: redis:6.2.7-alpine
