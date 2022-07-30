@@ -16,7 +16,7 @@ services:
       - local.env
     depends_on:
       - redis
-#      - ws-server
+      - ws-server
     ports:
       - "10000:9999"
 
@@ -27,8 +27,8 @@ services:
       - local.env
     ports:
       - "80:80"
- #   depends_on:
- #     - ws-client
+    depends_on:
+      - ws-client
 
   redis:
-    image: redis:6.2.7-alpine
+    image: redislabs/redistimeseries

@@ -23,26 +23,23 @@ async def init_redis():
     logging.debug("Redis connection created")
     return redis
 
-async def save_to_redis(redis, step_number, tickers):
+async def save_to_redis(redis, tickers):
     async with redis.client() as conn:
-        # for ticker_name, ticker_value in tickers.items():
-        #     await conn.hsetnx(ticker_name, step_number, ticker_value) # add ticker price for step in it doesn't exists
-        for ticker_name, ticker_value in tickers.items():
-            await conn.rpush(ticker_name, ticker_value)
-        logging.info("STEP %s SAVED to REDIS", step_number)
+        ts = tickers.pop("ts")
+        for ticker_name, value in tickers.items():
+            await conn.execute_command('TS.ADD', ticker_name, ts, value)
+
+        logging.info(":::SAVED to REDIS, timestamp %s ", ts)
 
 
 
 async def ws_connect():
     redis = await init_redis()
-    step_number = 0
     async with websockets.connect(f"ws://{WEBSOCKET_HOST}:{WEBSOCKET_PORT}") as websocket:
         async for message in websocket:
             tickers = json.loads(message)
-            # logging.info(tickers)
-            await save_to_redis(redis, step_number, tickers)
-            step_number += 1
-            #await load_from_redis(redis)
+            #logging.info(tickers["ts"])
+            await save_to_redis(redis, tickers)
 
 
 
