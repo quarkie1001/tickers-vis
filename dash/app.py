@@ -22,11 +22,10 @@ server = app.server
 
 tickers_names = get_ticker_names()
 redis = init_redis_conn()
-redis.set("current_ticker", "ticker_00")
+
 
 app.layout = app_layout()
 
-fig = go.Figure(data=go.Scatter(x=df["Step"], y=df["Value"]))
 
 @app.callback(Output("caption", "children"), Input("ticker-dropdown", "value"))
 def set_caption(value, redis_conn=redis):

@@ -9,7 +9,6 @@ from logic import init_tickers, calculate_step
 
 WEBSOCKET_HOST = os.getenv("WEBSOCKET_HOST", "ws-server")
 WEBSOCKET_PORT = os.getenv("WEBSOCKET_PORT", 9999)
-USE_UNIX_TS = os.get_env("USE_UNIX_TS", False)
 
 LOG_LEVEL_ENV = os.getenv("LOG_LEVEL", "debug")
 
@@ -29,8 +28,8 @@ async def handler(websocket):
         try:
             current_tickers = await calculate_step(current_tickers)
             message = json.dumps(current_tickers)
-            await asyncio.sleep(1)
             await websocket.send(message)
+            await asyncio.sleep(1)
         except (KeyboardInterrupt, ConnectionClosedOK):
             logging.info("Got signal to stop Websocket server")
             return

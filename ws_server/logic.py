@@ -1,16 +1,9 @@
-import os
 from random import random
 import time
 
 
-USE_UNIX_TS = os.getenv("USE_UNIX_TS", False)
-
-
 async def init_tickers():
-    if USE_UNIX_TS.lower() in ("yes", "true", "t", "y"):
-        start_timestamp = int(time.time())
-    else:
-        start_timestamp = 0
+    start_timestamp = int(time.time())
 
     tickers_keys = [f"ticker_{num:02d}" for num in range(100)]
     tickers_dict = dict.fromkeys(tickers_keys, 0)

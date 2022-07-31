@@ -39,7 +39,6 @@ async def ws_connect():
     ) as websocket:
         async for message in websocket:
             tickers = json.loads(message)
-            # logging.info(tickers["ts"])
             await save_to_redis(redis, tickers)
 
 

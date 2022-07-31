@@ -1,4 +1,4 @@
-from dash import html, dcc, Input, Output
+from dash import html, dcc
 
 from utils import get_ticker_names
 
