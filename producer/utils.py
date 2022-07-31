@@ -17,11 +17,11 @@ async def generate_movement():
     return movement
 
 
-async def calculate_step(current):
-    logging.debug(current)
+async def calculate_step(tickers):
+    logging.debug(tickers)
     deltas = [await generate_movement() for _ in range(100)]
-    new_values = [x + int(y) for x, y in zip(current.values(), deltas)]
-    new_dict = {k: v for k, v in zip(current.keys(), new_values)}
+    new_values = [x + int(y) for x, y in zip(tickers.values(), deltas)]
+    new_dict = {k: v for k, v in zip(tickers.keys(), new_values)}
 
     return new_dict
 
