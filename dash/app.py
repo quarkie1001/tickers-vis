@@ -1,15 +1,14 @@
 import logging
 import os
 
+from dash import Dash, Input, Output
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.graph_objs as go
-import redis
 
-from dash import Dash, html, dcc, Input, Output
-
-
-tickers_names = [1, 2, 34, 5, 6, 7, 8, 9]
+from layout import app_layout
+from redis_helpers import init_redis_conn, load_values
+from utils import get_ticker_names
 
 
 LOG_LEVEL_ENV = os.getenv("LOG_LEVEL", "debug")
@@ -21,38 +20,36 @@ logging.basicConfig(encoding="utf-8", level=LOG_LEVEL_MAP[LOG_LEVEL_ENV])
 app = Dash(external_stylesheets=[dbc.themes.CYBORG])
 server = app.server
 
-r = redis.from_url("redis://redis", decode_responses=True)
-# ticker_prices = r.hgetall("ticker_05")
-# print(ticker_prices)
-# prices = dict(sorted(ticker_prices.items()))
-# logging.info(prices)
-#
-# ticker_data = list(zip(prices.values(), prices.keys()))
-#
-# df = pd.DataFrame(ticker_data, columns = ["Value", "Step"])
+tickers_names = get_ticker_names()
+redis = init_redis_conn()
+redis.set("current_ticker", "ticker_00")
 
-ticker_prices = r.ts()
-logging.info(ticker_prices)
+app.layout = app_layout()
 
 fig = go.Figure(data=go.Scatter(x=df["Step"], y=df["Value"]))
 
-app.layout = html.Div(
-    children=[
-        html.H1(children="Dummy tickers"),
-        html.H3(
-            children="""
-        Test assignment for Skanestas Investments Ltd.
-    """
-        ),
-        #  dcc.Dropdown(tickers_names, tickers_names[0], id='ticker-dropdown', style={"margin-top" : "40px"}),
-        dcc.Graph(
-            id="graph",
-            figure=fig,
-        ),
-        html.H2(id="caption", style={"text-align": "center"}),
-    ]
-)
+@app.callback(Output("caption", "children"), Input("ticker-dropdown", "value"))
+def set_caption(value, redis_conn=redis):
+    redis_conn.set("current_ticker", value)
 
-
-def update_output(value):
     return f"{value}"
+
+
+@app.callback(
+    Output("live-update-graph", "figure"), Input("interval-component", "n_intervals")
+)
+def update_graph_live(n, redis_conn=redis):
+    ticker_name = redis_conn.get("current_ticker")
+    ticker_prices = load_values(redis_conn, ticker_name)
+    if not ticker_prices:
+        fig = go.Figure(go.Scatter())
+    else:
+        df = pd.DataFrame(ticker_prices, columns=["Timestamp", "Value"])
+        df["Value"] = pd.to_numeric(df["Value"]).astype(int)
+        df = df.sort_values(by="Timestamp")
+        logging.info(df)
+        fig = go.Figure(data=go.Scatter(x=df["Timestamp"], y=df["Value"]))
+
+    logging.info(ticker_prices)
+
+    return fig
