@@ -45,12 +45,17 @@ def update_graph_live(n, redis_conn=redis):
     else:
         df = pd.DataFrame(ticker_prices, columns=["Timestamp", "Value"])
         df["Value"] = pd.to_numeric(df["Value"]).astype(int)
-        df["Timestamp"] = pd.to_datetime(df["Timestamp"], unit='s')
+        df["Timestamp"] = pd.to_datetime(df["Timestamp"], unit="s")
         df = df.sort_values(by="Timestamp")
-        logging.info(df)
+        logging.debug(df)
 
-        fig = go.Figure(data=go.Scatter(x=df["Timestamp"], y=df["Value"],
-                                        hovertemplate='Value: %{y}'+'<br>Timestamp: %{x}'))
+        fig = go.Figure(
+            data=go.Scatter(
+                x=df["Timestamp"],
+                y=df["Value"],
+                hovertemplate="Value: %{y}" + "<br>Timestamp: %{x}",
+            )
+        )
 
     logging.info(ticker_prices)
 
