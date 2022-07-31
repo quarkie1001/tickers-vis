@@ -1,7 +1,7 @@
-import logging
 import time
 
 import redis
+
 
 def init_redis_conn():
     conn = redis.from_url("redis://redis", decode_responses=True)
