@@ -9,7 +9,6 @@ def init_redis_conn():
 
     return conn
 
-
 def load_values(redis, ticker_name):
     current_ts = int(time.time()) + 1
     values = redis.execute_command(
@@ -17,3 +16,8 @@ def load_values(redis, ticker_name):
     )
 
     return values
+
+def get_ticker_names():
+    ticker_names = [f"ticker_{num:02d}" for num in range(100)]
+
+    return ticker_names

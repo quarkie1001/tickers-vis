@@ -5,13 +5,11 @@ import os
 import websockets
 from websockets.exceptions import ConnectionClosedOK
 
-from logic import init_tickers, calculate_step
+from utils import init_tickers, calculate_step
 
 WEBSOCKET_HOST = os.getenv("WEBSOCKET_HOST", "ws-server")
 WEBSOCKET_PORT = os.getenv("WEBSOCKET_PORT", 9999)
-
 LOG_LEVEL_ENV = os.getenv("LOG_LEVEL", "debug")
-
 LOG_LEVEL_MAP = {"debug": logging.DEBUG, "info": logging.INFO}
 
 logging.basicConfig(encoding="utf-8", level=LOG_LEVEL_MAP[LOG_LEVEL_ENV])

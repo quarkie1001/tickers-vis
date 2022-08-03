@@ -7,8 +7,7 @@ import pandas as pd
 import plotly.graph_objs as go
 
 from layout import app_layout
-from redis_helpers import init_redis_conn, load_values
-from utils import get_ticker_names
+from utils import get_ticker_names, init_redis_conn, load_values
 
 
 LOG_LEVEL_ENV = os.getenv("LOG_LEVEL", "debug")
